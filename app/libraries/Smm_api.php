@@ -76,6 +76,13 @@ class Smm_api
         return $result;
     }
 
+    public function refill_status($api_params = [], $refill_id)
+    {
+        $api = new smm_standard($api_params);
+        $result = $api->refill_status($refill_id);
+        return $result;
+    }
+
     public function crud_provider_services_json_file($params = null, $option = null)
     {
         // Delete old Json services  list

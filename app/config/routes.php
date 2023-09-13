@@ -85,7 +85,11 @@ $route['cardlink_ipn']      = 'add_funds/cardlink/ipn/';
 $route['flutterwave_ipn']   = 'add_funds/flutterwave/ipn/';
 $route['razorpay_ipn']      = 'add_funds/razorpay/ipn/';
 $route['epayco_ipn']        = 'add_funds/epayco/ipn/';
-$route['webmoney_ipn']        = 'add_funds/webmoney/ipn/';
+$route['webmoney_ipn']      = 'add_funds/webmoney/ipn/';
+$route['mpesa_ipn']         = 'add_funds/mpesa_/ipn/';
+$route['paytr_ipn']         = 'add_funds/paytr/ipn/';
+$route['ecpay_ipn']         = 'add_funds/ecpay/ipn/';
+$route['(:any)_ipn']        = 'add_funds/$1/ipn/';
 
 //$route['cron/pix']     					= 'add_funds/pix/list_pix';
 
@@ -97,6 +101,7 @@ $route['payop/cron']                    = 'add_funds/payop/cron';
 $route['midtrans/cron']                 = 'add_funds/midtrans/cron';
 $route['paymongo/cron']                 = 'add_funds/paymongo/cron';
 $route['payku/cron']                    = 'add_funds/payku/cron';
+$route['cron/refill_status']            = 'refill/cron';
 
 
 // API provider cron

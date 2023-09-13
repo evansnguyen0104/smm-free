@@ -14,6 +14,14 @@
 
 <?php
   $sidebar_elements = app_config('controller')['user'];
+  if (!is_table_exists(AFFILIATE) || !get_option('affiliate_mode', 0)) unset($sidebar_elements['affiliates']);
+  if (is_table_exists(AFFILIATE)) {
+    $item_affiliate = $CI->model->get('status', AFFILIATE, ['uid' => session('uid')], '', '', true);
+    if ($item_affiliate && !$item_affiliate['status']) {
+      unset($sidebar_elements['affiliates']);
+    }
+  }
+  if (!is_table_exists(ORDERS_REFILL)) unset($sidebar_elements['refill']);
   $xhtml = '<ul class="navbar-nav mb-md-4" id="menu">';
   foreach ($sidebar_elements as $key => $item) {
     $item_name = lang($item['name']);

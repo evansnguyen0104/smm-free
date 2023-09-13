@@ -111,6 +111,12 @@
             </div>
           </li>
 
+          <?php if (is_table_exists(ORDERS_REFILL)): ?>
+            <li class="nav-item">
+              <a href="<?=cn($header_elements['refill']['route-name']); ?>" class="nav-link <?=(segment(1) == $header_elements['refill']['route-name']) ? "active":"" ?>"><i class="<?=$header_elements['refill']['icon']; ?>"></i> <?=lang($header_elements['refill']['name']); ?></a>
+            </li>   
+          <?php endif; ?>
+
           <li class="nav-item">
             <a href="<?=cn($header_elements['services']['route-name']); ?>" class="nav-link <?=(segment(1) == $header_elements['services']['route-name'])? "active" : "" ?>"><i class="<?=$header_elements['services']['icon']; ?>"></i> <?=lang($header_elements['services']['name']); ?></a>
           </li>   
@@ -121,8 +127,7 @@
             <li class="nav-item">
               <a href="<?=cn($header_elements['api']['route-name']); ?>" class="nav-link <?=(segment(2) == 'docs')?"active":""?>"><i class="<?=$header_elements['api']['icon']; ?>"></i> <?=lang($header_elements['api']['name']); ?></a>
             </li>   
-          <?php }?>   
-                 
+          <?php }?>
           <li class="nav-item">
             <a href="javascript:void(0)" class="nav-link <?=(in_array(segment(1), ['tickets', 'faq'])) ? "active":""?>" data-toggle="dropdown"><i class="fa fa-comments-o"></i>
               <?=lang('Support')?> <span class="badge badge-info"><?=$total_unread_tickets?></span>
@@ -135,13 +140,28 @@
               <a href="<?=$header_elements['faq']['route-name']?>" class="dropdown-item "><?=lang($header_elements['faq']['name']); ?></a>
             </div>
           </li>
-          
           <li class="nav-item">
             <a href="<?=cn($header_elements['add_funds']['route-name']); ?>" class="nav-link <?=(segment(1) == $header_elements['add_funds']['route-name'])? "active" : "" ?>"><i class="<?=$header_elements['add_funds']['icon']; ?>"></i> <?=lang($header_elements['add_funds']['name']); ?></a>
           </li>   
           <li class="nav-item">
             <a href="<?=cn($header_elements['transactions']['route-name']); ?>" class="nav-link <?=(segment(1) == $header_elements['transactions']['route-name'])? "active" : "" ?>"><i class="<?=$header_elements['transactions']['icon']; ?>"></i> <?=lang($header_elements['transactions']['name']); ?></a>
-          </li>   
+          </li>
+
+          <?php
+            $enable_affiliate = true;
+            if (!is_table_exists(AFFILIATE) || !get_option('affiliate_mode', 0)) $enable_affiliate = false;
+            if (is_table_exists(AFFILIATE)) {
+              $item_affiliate = $CI->model->get('status', AFFILIATE, ['uid' => session('uid')], '', '', true);
+              if ($item_affiliate && !$item_affiliate['status']) {
+                $enable_affiliate = false;
+              }
+            }
+          ?>
+          <?php if ($enable_affiliate): ?>
+            <li class="nav-item">
+              <a href="<?=cn($header_elements['affiliates']['route-name']); ?>" class="nav-link <?=(segment(2) == $header_elements['affiliates']['route-name'])?"active":""?>"><i class="<?=$header_elements['affiliates']['icon']; ?>"></i> <?=lang($header_elements['affiliates']['name']); ?></a>
+            </li>   
+          <?php endif; ?>
           
         </ul>
       </div>

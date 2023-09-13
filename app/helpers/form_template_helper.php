@@ -154,13 +154,60 @@ function render_modal_html($params = [])
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body" style="text-align:left">
-                        <div class="form-group">
-                            %s
-                        </div>
+                        %s
                     </div>
                 </div>
             </div>
         </div>',
         $params['btn-class'], $params['data-target'], $params['btn-title'], $params['modal-id'], $params['modal-size'], $params['modal-title'], $params['modal-body-content']);
     return $xhtml;
+}
+
+/**
+ * From V4.0
+ * @param $item data
+ * @return html button details
+ */
+if (!function_exists('render_modal_body_content')) {
+    function render_modal_body_content($controller_name, $item = [])
+    {
+        switch ($controller_name) {
+            case 'refill':
+                $api_name = $item['api_name'];
+                $details = json_encode(json_decode($item['details']), JSON_PRETTY_PRINT);
+                $date = convert_timezone($item['last_updated'], "user");
+                $xhtml    = sprintf(
+                    '<div class="row justify-content-md-center">
+                        <div class="col-md-12 col-sm-12 col-xs-12">
+                            <div class="form-group">
+                                <label>%s</label>
+                                <textarea rows="7" readonly  class="form-control square">%s</textarea>
+                            </div>
+                        </div> 
+                        <div class="col-md-12 col-sm-12 col-xs-12">
+                            <div class="form-group">
+                                <label >Last Update</label>
+                                <input type="text" class="form-control square" readonly value="%s">
+                            </div>
+                        </div>
+                    </div>',
+                    $api_name, $details, $date);
+                break;
+
+            case 'services':
+
+                if (!empty($item['desc'])) {
+                    $description = html_entity_decode($item['desc'], ENT_QUOTES);
+                    $description = str_replace("\n", "<br>", $description);
+                    $xhtml    = sprintf(
+                        '<div class="form-group">
+                            %s
+                        </div>',
+                        $description);
+                }
+                break;
+
+        }
+        return $xhtml;
+    }
 }

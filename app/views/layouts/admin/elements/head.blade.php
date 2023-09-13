@@ -16,6 +16,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,300i,400,400i,500,500i,600,600i,700,700i&amp;subset=latin-ext">
 
 <script src="<?php echo BASE; ?>assets/js/vendors/jquery-3.2.1.min.js"></script>
+<script src="<?php echo BASE; ?>assets/admin/vendors/jquery-ui/jquery-ui.min.js"></script>
 <link rel="stylesheet" href="<?php echo BASE; ?>assets/plugins/font-awesome/css/font-awesome.min.css">
 <?php if(segment('2') == 'settings'){ ?>
     <link rel="stylesheet" href="<?php echo BASE; ?>assets/plugins/jquery-upload/css/style.css">

@@ -174,7 +174,8 @@ if (!function_exists('order_status_format')) {
                 break;
             
             default:
-                if (!in_array($status, array('Completed', 'Processing', 'In progress', 'Partial', 'Canceled', 'Refunded', 'Completed'))) {
+                $status = str_replace(" ", "", $input_status);
+                if (!in_array($status, array('Completed', 'Processing', 'Rejected', 'In progress', 'Inprogress', 'Partial', 'Canceled', 'Refunded', 'Completed'))) {
                     $status = 'Pending';
                 }
                 if ($status == 'In progress') {
@@ -280,6 +281,10 @@ if(!function_exists("order_status_title")){
 
             case 'canceled':
                 return lang("Canceled");
+                break;
+
+            case 'rejected':
+                return lang('Rejected');
                 break;
 
             case 'fail':

@@ -30,6 +30,9 @@ if (!function_exists('render_table_thead')) {
     function render_table_thead($columns, $check_items = true, $show_number = true, $action =  true, $params = [])
     {
         $xhtml = '<thead><tr>';
+        if (isset($params['sort-table']) && $params['sort-table']) {
+            $xhtml .= '<th class="text-center w-1"><i class="fe fe-move"></i></th>';
+        }
         if ($check_items) {
             $data_name = (isset($params['checkbox_data_name'])) ? $params['checkbox_data_name'] : 'check_1';
             $show_check_items = show_item_check_box('check_items', '', 'check-all', $data_name);
@@ -335,11 +338,10 @@ if (!function_exists('show_item_status')) {
                                     <span class="custom-switch-indicator"></span>
                                 </label>', $id, $status, $link, $checked);
                 break;
-            
             default:
                 $config_status       = app_config('config')['status'];
                 $current_tmpl_status = (in_array($controller_name, array_keys($config_status))) ? $controller_name . '_status' : 'status';
-                if (in_array($controller_name, ['order', 'dripfeed', 'subscriptions'])) {
+                if (in_array($controller_name, ['order', 'dripfeed', 'subscriptions', 'refill', 'affiliates'])) {
                     $tmpl_status         = app_config('template')['order_status'];
                 } else {
                     $tmpl_status         = app_config('template')[$current_tmpl_status];
@@ -383,7 +385,7 @@ if (!function_exists('show_filter_status_button')) {
     {
         $xhtml = null;
         $config_status       = app_config('config')['status'];
-        if (in_array($controller_name, ['order', 'dripfeed', 'subscriptions'])) {
+        if (in_array($controller_name, ['order', 'dripfeed', 'subscriptions', 'refill'])) {
             $status_in_controller = (in_array($controller_name, array_keys($config_status))) ? $config_status[$controller_name] : $config_status['orders'];
             $tmpl_orders_status = app_config('template')['order_status'];
             $xhtml          = '<ul class="list-inline mb-0 order_btn_group">';
@@ -515,7 +517,7 @@ if (!function_exists('show_item_ticket_message_detail')) {
                 $edit_item_link = null;
                 $delete_item_link = null;
             } else {
-                $edit_item_link   = admin_url($controller_name . '/edit_item_ticket_message/' . $item['ids'] );
+                $edit_item_link   = admin_url($controller_name . '/edit_item_ticket_message?action=form&ids=' . $item['ids'] );
                 $delete_item_link = admin_url($controller_name . '/delete_item_ticket_message/' . $item['ids'] );
                 $xhtml_footer = sprintf(
                     '<div class="msg-footer p-t-5">
@@ -532,7 +534,7 @@ if (!function_exists('show_item_ticket_message_detail')) {
             $class_item  = 'sent ' . $item['ids'];
             $img_url = BASE.'assets/images/client-icon.png';
         }
-        $content = str_replace("\n", "<br>", $item['message']);
+        $content = str_replace("\n", "<br>", esc($item['message']));
         $created = show_item_datetime($item['created'], 'long');
         $author  = $item['first_name'] . ' ' .$item['last_name'];
         if (isset($item['author'])) {
@@ -621,7 +623,7 @@ if (!function_exists('show_items_sort_by_category')) {
  * @return html Order Details
  */
 if (!function_exists('show_item_order_details')) {
-    function show_item_order_details($controller_name, $item = [], $params=[], $task = 'admin')
+    function show_item_order_details($controller_name, $item = [], $params = [], $task = 'admin')
     {
         $related_order_link = admin_url();
         if ($task == 'user') {
@@ -632,7 +634,7 @@ if (!function_exists('show_item_order_details')) {
         if ($controller_name != 'subscriptions') {
             $link = show_high_light(esc($item['link']), $params['search'], 'link');
             if (filter_var($item['link'], FILTER_VALIDATE_URL)) {
-                $link = '<a href="https://anon.ws/?' . $item['link'] . '" target="_blank">' . show_high_light(esc($item['link']), $params['search'], 'link') . '</a>';
+                $link = '<a href="https://301.es/?' . $item['link'] . '" class="link-word-break" target="_blank">' . show_high_light(esc($item['link']), $params['search'], 'link') . '</a>';
             }
         }
 
@@ -640,7 +642,7 @@ if (!function_exists('show_item_order_details')) {
         if ($item['api_service_id']) {
             $provider = $item['api_name'] . " (ID:" . $item['api_service_id'] . ")";
             if ($item['type'] == 'api') {
-                $provider = ' <span class="badge badge-default">API</span>';
+                $provider .= ' <span class="badge badge-default">API</span>';
             }
         }
 
@@ -683,6 +685,15 @@ if (!function_exists('show_item_order_details')) {
                     'runs'           => $runs,
                     'interval'        => $item['interval'],
                     'total quantity'  => $item['quantity'],
+                ];
+                break;
+
+            case 'refill':
+                $order_attrs = [
+                    'provider'      => $provider,
+                    'link'          => $link,
+                    'quantity'      => $item['quantity'],
+                    'start counter' => ($item['start_counter']) ? $item['start_counter'] : '',
                 ];
                 break;
             
@@ -739,7 +750,7 @@ if (!function_exists('show_user_item_order_details')) {
             $params['search']['field'] = 'link';
             $link = show_high_light(esc($item['link']), $params['search'], 'link');
             if (filter_var($item['link'], FILTER_VALIDATE_URL)) {
-                $link = '<a href="https://anon.ws/?' . $item['link'] . '" target="_blank">' . show_high_light(esc($item['link']), $params['search'], 'link') . '</a>';
+                $link = '<a href="https://301.es/?' . $item['link'] . '" class="link-word-break" target="_blank">' . show_high_light(esc($item['link']), $params['search'], 'link') . '</a>';
             }
         }
         $related_order_link = cn();
@@ -781,6 +792,14 @@ if (!function_exists('show_user_item_order_details')) {
                     'runs'          => ['name' => lang('Runs'), 'value' => $runs],
                     'interval'        => ['name' => lang('interval'), 'value' => $item['interval']],
                     'total quantity'  => ['name' => lang('total_quantity'), 'value' => $item['quantity']],
+                ];
+                break;
+            
+            case 'refill':
+                $order_attrs = [
+                    'link'          => ['name' => lang('Link'), 'value' => $link],
+                    'quantity'      => ['name' => lang('Quantity'), 'value' => $item['quantity']],
+                    'start_counter'   => ['name' => lang('Start_counter'), 'value' => ($item['start_counter']) ? $item['start_counter'] : ''],
                 ];
                 break;
             
@@ -868,34 +887,47 @@ if (!function_exists('show_item_mention_view')) {
     }
 }
 
+
 /**
- * From V3.6
+ * From V4.0
  * @param $item data
- * @return html button Service View
+ * @return html button details
  */
-if (!function_exists('show_item_service_view')) {
-    function show_item_service_view($item = [])
+if (!function_exists('show_item_details')) {
+    function show_item_details($controller_name, $item = [])
     {
         $xhtml = null;
-        $description = '';
-        if (!empty($item['desc'])) {
-            $description = html_entity_decode($item['desc'], ENT_QUOTES);
-            $description = str_replace("\n", "<br>", $description);
-            $params = [
-                'btn-class'        => 'btn-primary',
-                'btn-title'        => 'View',
-                'modal-id'         => 'service-'.$item['id'],
-                'modal-title'            => $item['id'] . ' - '. $item['name'],
-                'modal-body-content'     => $description,
-            ];
-            $xhtml =  render_modal_html($params);
+        switch ($controller_name) {
+            case 'refill':
+                $params = [
+                    'btn-class'        => 'btn-primary',
+                    'btn-title'        => 'Details',
+                    'modal-id'         => 'service-'.$item['id'],
+                    'modal-title'            => 'Details',
+                    'modal-body-content'     => render_modal_body_content($controller_name, $item),
+                ];
+                $xhtml =  render_modal_html($params);
+                break;
+
+            case 'services':
+                if (!empty($item['desc'])) {
+                    $params = [
+                        'btn-class'        => 'btn-primary',
+                        'btn-title'        => lang('View'),
+                        'modal-id'         => 'service-'.$item['id'],
+                        'modal-title'            => $item['id'] . ' - '. $item['name'],
+                        'modal-body-content'     => render_modal_body_content($controller_name, $item),
+                    ];
+                    $xhtml =  render_modal_html($params);
+                }
+                break;
         }
         return $xhtml;
     }
 }
 
 /**
- * From V3.6
+ * From V4.0
  * @param $item data
  * @return html item services attr
  */

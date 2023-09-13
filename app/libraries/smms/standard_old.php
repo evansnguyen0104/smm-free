@@ -4,15 +4,15 @@ class smm_standard{
     public $api_key;
     public $ci;
 
-    public function __construct($api_params = ""){
-      $this->api_url = $api_params['url'];
-      $this->api_key = $api_params['key'];
+    public function __construct($api = ""){
+      $this->api_url = $api->url;
+      $this->api_key = $api->key;
       $this->ci      = &get_instance();
     }
 
     public function order($data) {
       $post = array_merge(array('key' => $this->api_key, 'action' => 'add'), $data);
-      return json_decode($this->connect($post), true);
+      return json_decode($this->connect($post));
     }
 
     public function status($order_id) {
@@ -20,45 +20,29 @@ class smm_standard{
           'key' => $this->api_key,
           'action' => 'status',
           'order' => $order_id
-      )), true);
+      )));
     }
 
     public function multiStatus($order_ids) {
       return json_decode($this->connect(array(
           'key' => $this->api_key,
           'action' => 'status',
-          'orders' => implode(",", $order_ids)
-      )), true);
+          'orders' => implode(",", (array)$order_ids)
+      )));
     }
 
     public function services() { 
       return json_decode($this->connect(array(
           'key' => $this->api_key,
           'action' => 'services',
-      )), true);
+      )));
     }
 
     public function balance() { // get balance
       return json_decode($this->connect(array(
           'key' => $this->api_key,
           'action' => 'balance',
-      )), true);
-    }
-
-    public function refill($order_id) { // get balance
-      return json_decode($this->connect(array(
-          'key' => $this->api_key,
-          'action' => 'refill',
-          'order'  => $order_id,
-      )), true);
-    }
-
-    public function refill_status($refill_id) { // get balance
-      return json_decode($this->connect(array(
-          'key' => $this->api_key,
-          'action' => 'refill_status',
-          'refill'  => $refill_id,
-      )), true);
+      )));
     }
 
     // private function connect($post) {
@@ -91,7 +75,7 @@ class smm_standard{
       $_post = Array();
       if (is_array($post)) {
           foreach ($post as $name => $value) {
-            $_post[] = $name.'='.urlencode($value);
+              $_post[] = $name.'='.urlencode($value);
           }
       }
 

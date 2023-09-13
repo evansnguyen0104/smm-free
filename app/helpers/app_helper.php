@@ -101,3 +101,19 @@ if (!function_exists('lock_file')) {
         return true;
     }
 }
+
+
+/**
+ * @param $table
+ * @return boole
+ */
+if (!function_exists('is_table_exists')) {
+    function is_table_exists($table = '')
+    {
+        $CI = &get_instance();
+        if ($table && $CI->db->table_exists($table)) {
+            return true;
+        }
+        return false;
+    }
+}

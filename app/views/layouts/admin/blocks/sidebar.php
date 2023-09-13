@@ -10,9 +10,13 @@
   $CI->load->model('model', 'model');
   $total_unread_tickets = $CI->model->count_results('id', TICKETS, ['admin_read' => 1]);
 ?>
-
 <?php
   $sidebar_elements = app_config('controller')['admin'];
+  if (!is_table_exists(USER_LOGS)) unset($sidebar_elements['users_activity']);
+  if (!is_table_exists(USER_BLOCK_IP)) unset($sidebar_elements['users_banned_ip']);
+  if (!is_table_exists(USER_MAIL_LOGS)) unset($sidebar_elements['affiliates']);
+  if (!is_table_exists(AFFILIATE) || !get_option('affiliate_mode', 0)) unset($sidebar_elements['affiliates']);
+  if (!is_table_exists(ORDERS_REFILL)) unset($sidebar_elements['refill']);
   $xhtml = '<ul class="navbar-nav mb-md-4" id="menu">';
   foreach ($sidebar_elements as $key => $item) {
     if ($item['area_title']) {
